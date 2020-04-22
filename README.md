@@ -1,2 +1,0 @@
-# kkbot
-Kycklingkryddeboten
