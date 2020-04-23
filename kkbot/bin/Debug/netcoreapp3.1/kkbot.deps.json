@@ -8,7 +8,7 @@
     ".NETCoreApp,Version=v3.1": {
       "kkbot/1.0.0": {
         "dependencies": {
-          "DSharpPlus": "4.0.0-nightly-00683",
+          "DSharpPlus": "4.0.0-nightly-00686",
           "DSharpPlus.CommandsNext": "4.0.0-nightly-00683",
           "DSharpPlus.Interactivity": "4.0.0-nightly-00683"
         },
@@ -16,7 +16,7 @@
           "kkbot.dll": {}
         }
       },
-      "DSharpPlus/4.0.0-nightly-00683": {
+      "DSharpPlus/4.0.0-nightly-00686": {
         "dependencies": {
           "Newtonsoft.Json": "12.0.3",
           "System.Memory": "4.5.3",
@@ -27,14 +27,14 @@
         },
         "runtime": {
           "lib/netstandard2.0/DSharpPlus.dll": {
-            "assemblyVersion": "4.0.0.683",
-            "fileVersion": "4.0.0.683"
+            "assemblyVersion": "4.0.0.686",
+            "fileVersion": "4.0.0.686"
           }
         }
       },
       "DSharpPlus.CommandsNext/4.0.0-nightly-00683": {
         "dependencies": {
-          "DSharpPlus": "4.0.0-nightly-00683",
+          "DSharpPlus": "4.0.0-nightly-00686",
           "Microsoft.Extensions.DependencyInjection": "3.1.1"
         },
         "runtime": {
@@ -46,7 +46,7 @@
       },
       "DSharpPlus.Interactivity/4.0.0-nightly-00683": {
         "dependencies": {
-          "DSharpPlus": "4.0.0-nightly-00683"
+          "DSharpPlus": "4.0.0-nightly-00686"
         },
         "runtime": {
           "lib/netstandard2.0/DSharpPlus.Interactivity.dll": {
@@ -676,12 +676,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "DSharpPlus/4.0.0-nightly-00683": {
+    "DSharpPlus/4.0.0-nightly-00686": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-CoYgKZp3S8sUxtTmbEllBU6b23F35b4bRb0EgR5ZEnDr5JSkNwN7cQQBnB+ERJeXFR8CACoizFau+RlDPSP9Ug==",
-      "path": "dsharpplus/4.0.0-nightly-00683",
-      "hashPath": "dsharpplus.4.0.0-nightly-00683.nupkg.sha512"
+      "sha512": "sha512-oJ0olk6B2F5gQYa7VR1Nj2/O6m8itUdbpdliGd9nWpkvuNtYceWX6jHFmGIV82iSLB4t8zsaFNWwfEveUMsAUg==",
+      "path": "dsharpplus/4.0.0-nightly-00686",
+      "hashPath": "dsharpplus.4.0.0-nightly-00686.nupkg.sha512"
     },
     "DSharpPlus.CommandsNext/4.0.0-nightly-00683": {
       "type": "package",

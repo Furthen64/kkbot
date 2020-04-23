@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\REPOS\\kkbot\\kkbot\\kkbot.csproj": {}
+    "C:\\repos\\kkbot\\kkbot\\kkbot.csproj": {}
   },
   "projects": {
-    "C:\\REPOS\\kkbot\\kkbot\\kkbot.csproj": {
+    "C:\\repos\\kkbot\\kkbot\\kkbot.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\REPOS\\kkbot\\kkbot\\kkbot.csproj",
+        "projectUniqueName": "C:\\repos\\kkbot\\kkbot\\kkbot.csproj",
         "projectName": "kkbot",
-        "projectPath": "C:\\REPOS\\kkbot\\kkbot\\kkbot.csproj",
-        "packagesPath": "C:\\Users\\fat64\\.nuget\\packages\\",
-        "outputPath": "C:\\REPOS\\kkbot\\kkbot\\obj\\",
+        "projectPath": "C:\\repos\\kkbot\\kkbot\\kkbot.csproj",
+        "packagesPath": "C:\\Users\\fatguest\\.nuget\\packages\\",
+        "outputPath": "C:\\repos\\kkbot\\kkbot\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\fat64\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\fatguest\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -41,7 +41,7 @@
           "dependencies": {
             "DSharpPlus": {
               "target": "Package",
-              "version": "[4.0.0-nightly-00683, )"
+              "version": "[4.0.0-nightly-00686, )"
             },
             "DSharpPlus.CommandsNext": {
               "target": "Package",

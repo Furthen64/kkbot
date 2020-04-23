@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v3.1": {
-      "DSharpPlus/4.0.0-nightly-00683": {
+      "DSharpPlus/4.0.0-nightly-00686": {
         "type": "package",
         "dependencies": {
           "Newtonsoft.Json": "12.0.3",
@@ -1170,13 +1170,13 @@
     }
   },
   "libraries": {
-    "DSharpPlus/4.0.0-nightly-00683": {
-      "sha512": "CoYgKZp3S8sUxtTmbEllBU6b23F35b4bRb0EgR5ZEnDr5JSkNwN7cQQBnB+ERJeXFR8CACoizFau+RlDPSP9Ug==",
+    "DSharpPlus/4.0.0-nightly-00686": {
+      "sha512": "oJ0olk6B2F5gQYa7VR1Nj2/O6m8itUdbpdliGd9nWpkvuNtYceWX6jHFmGIV82iSLB4t8zsaFNWwfEveUMsAUg==",
       "type": "package",
-      "path": "dsharpplus/4.0.0-nightly-00683",
+      "path": "dsharpplus/4.0.0-nightly-00686",
       "files": [
         ".nupkg.metadata",
-        "dsharpplus.4.0.0-nightly-00683.nupkg.sha512",
+        "dsharpplus.4.0.0-nightly-00686.nupkg.sha512",
         "dsharpplus.nuspec",
         "lib/netstandard1.3/DSharpPlus.dll",
         "lib/netstandard1.3/DSharpPlus.xml",
@@ -4026,25 +4026,25 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
-      "DSharpPlus >= 4.0.0-nightly-00683",
+      "DSharpPlus >= 4.0.0-nightly-00686",
       "DSharpPlus.CommandsNext >= 4.0.0-nightly-00683",
       "DSharpPlus.Interactivity >= 4.0.0-nightly-00683"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\fat64\\.nuget\\packages\\": {}
+    "C:\\Users\\fatguest\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\REPOS\\kkbot\\kkbot\\kkbot.csproj",
+      "projectUniqueName": "C:\\repos\\kkbot\\kkbot\\kkbot.csproj",
       "projectName": "kkbot",
-      "projectPath": "C:\\REPOS\\kkbot\\kkbot\\kkbot.csproj",
-      "packagesPath": "C:\\Users\\fat64\\.nuget\\packages\\",
-      "outputPath": "C:\\REPOS\\kkbot\\kkbot\\obj\\",
+      "projectPath": "C:\\repos\\kkbot\\kkbot\\kkbot.csproj",
+      "packagesPath": "C:\\Users\\fatguest\\.nuget\\packages\\",
+      "outputPath": "C:\\repos\\kkbot\\kkbot\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\fat64\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\fatguest\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4071,7 +4071,7 @@
         "dependencies": {
           "DSharpPlus": {
             "target": "Package",
-            "version": "[4.0.0-nightly-00683, )"
+            "version": "[4.0.0-nightly-00686, )"
           },
           "DSharpPlus.CommandsNext": {
             "target": "Package",
