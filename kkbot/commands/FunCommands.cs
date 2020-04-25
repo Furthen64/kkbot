@@ -7,14 +7,96 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace kkbot.commands
 {
     public class FunCommands : BaseCommandModule
     {
-        // Register "pung" as a command with BaseCommandModule 
 
+
+        // returns 0 on OK
+        private int dlFileToTempFolder(string uriStr)
+        {
+            string errorStr = "";
+            int errorCode = 0;
+
+            string tempFolder = @"./temp/";
+            try
+            {
+                if (!System.IO.File.Exists(tempFolder)) {
+
+                    System.IO.Directory.CreateDirectory(tempFolder);
+                }
+
+            }
+            catch(Exception)
+            {
+                errorCode = -1;
+                errorStr = "Could not create temp folder!";
+            }
+
+            try
+            {
+
+                // Try to dl with webclient library
+                string address = uriStr;
+                string fileName = tempFolder + "output.json";
+
+                WebClient client = new WebClient();
+                client.DownloadFile(address, fileName);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+              
+            }
+
+            if (errorCode != 0)
+            {
+                Console.WriteLine(errorStr);
+                Console.WriteLine("error with dlFileToTempFolder() !");
+
+                return -1;
+            }
+            return 0;
+
+        }
+
+        [Description("Ger nuvarande temperatur i hagfors, skålviksvägen specifikt")]
+        [Command("smhi")]
+
+        public async Task smhi(CommandContext ctx)
+        {
+            int result = dlFileToTempFolder("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/13.677855/lat/60.044464/data.json");
+            if(result == 0)
+            {
+                try
+                {
+                    // lets parse the heck out of this json file
+
+                }
+            }
+        }
+
+        [Description("Test ladda ner fil")]
+        [Command("dl")]
+        public async Task dl(CommandContext ctx)
+        {
+            int result = dlFileToTempFolder("kattmåten");
+            
+            if(result != 0)
+            {
+                await ctx.Channel.SendMessageAsync("Fel vid nedladdning!").ConfigureAwait(false);
+            } else
+            {
+                await ctx.Channel.SendMessageAsync("Fil nedladdad.").ConfigureAwait(false);
+            }
+        }
+
+
+        // Register "pung" as a command with BaseCommandModule 
         [Description("Pläpomatens utvalda favoriter!")]
         [Command("pung")]
         public async Task pung(CommandContext ctx)
