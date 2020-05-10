@@ -4028,23 +4028,24 @@
     ".NETCoreApp,Version=v3.1": [
       "DSharpPlus >= 4.0.0-nightly-00686",
       "DSharpPlus.CommandsNext >= 4.0.0-nightly-00683",
-      "DSharpPlus.Interactivity >= 4.0.0-nightly-00683"
+      "DSharpPlus.Interactivity >= 4.0.0-nightly-00683",
+      "Newtonsoft.Json >= 12.0.3"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\fatguest\\.nuget\\packages\\": {}
+    "C:\\Users\\fat64\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\repos\\kkbot\\kkbot\\kkbot.csproj",
+      "projectUniqueName": "C:\\github\\kkbot\\kkbot\\kkbot.csproj",
       "projectName": "kkbot",
-      "projectPath": "C:\\repos\\kkbot\\kkbot\\kkbot.csproj",
-      "packagesPath": "C:\\Users\\fatguest\\.nuget\\packages\\",
-      "outputPath": "C:\\repos\\kkbot\\kkbot\\obj\\",
+      "projectPath": "C:\\github\\kkbot\\kkbot\\kkbot.csproj",
+      "packagesPath": "C:\\Users\\fat64\\.nuget\\packages\\",
+      "outputPath": "C:\\github\\kkbot\\kkbot\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\fatguest\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\fat64\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4080,6 +4081,10 @@
           "DSharpPlus.Interactivity": {
             "target": "Package",
             "version": "[4.0.0-nightly-00683, )"
+          },
+          "Newtonsoft.Json": {
+            "target": "Package",
+            "version": "[12.0.3, )"
           }
         },
         "imports": [

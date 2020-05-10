@@ -10,7 +10,8 @@
         "dependencies": {
           "DSharpPlus": "4.0.0-nightly-00686",
           "DSharpPlus.CommandsNext": "4.0.0-nightly-00683",
-          "DSharpPlus.Interactivity": "4.0.0-nightly-00683"
+          "DSharpPlus.Interactivity": "4.0.0-nightly-00683",
+          "Newtonsoft.Json": "12.0.3"
         },
         "runtime": {
           "kkbot.dll": {}

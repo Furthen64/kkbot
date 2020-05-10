@@ -3,12 +3,16 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Net;
 using System.Threading.Tasks;
+using kkbot.Singletons;
+using System.ComponentModel.DataAnnotations;
+using kkbot.DS.SMHI;
 
 namespace kkbot.commands
 {
@@ -17,7 +21,8 @@ namespace kkbot.commands
 
 
         // returns 0 on OK
-        private int dlFileToTempFolder(string uriStr)
+        // (-+) seems to work
+        private int dlFileToTempFolder(string uriStr, string outputFilename)
         {
             string errorStr = "";
             int errorCode = 0;
@@ -42,7 +47,8 @@ namespace kkbot.commands
 
                 // Try to dl with webclient library
                 string address = uriStr;
-                string fileName = tempFolder + "output.json";
+                string fileName = tempFolder + outputFilename;
+                Console.WriteLine("smhi: Downloaded to " + fileName);
 
                 WebClient client = new WebClient();
                 client.DownloadFile(address, fileName);
@@ -64,50 +70,60 @@ namespace kkbot.commands
 
         }
 
-        [Description("Ger nuvarande temperatur i hagfors, skålviksvägen specifikt")]
+        [Description("Ger nuvarande temperatur i hagfors, skålviksvägen")]
         [Command("smhi")]
-
         public async Task smhi(CommandContext ctx)
         {
-            int result = dlFileToTempFolder("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/13.677855/lat/60.044464/data.json");
-            if(result == 0)
+            string filename = "./temp/smhi_hagfors.txt";
+            string str = "Temp i Hagfors nu: ";
+            string temperature = "N/A";
+
+            int result = dlFileToTempFolder("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/13.677855/lat/60.044464/data.json",
+                                           "smhi_hagfors.txt");
+            if (result == 0)
             {
                 try
                 {
                     // lets parse the heck out of this json file
 
+                    // Vi får lov att skapa en C# class till just SMHI:s json-fil. Så därså.
+                    string[] lines = File.ReadAllLines(filename);// WORRY MAYBE IS TOO BIG FILE YA?
+                    SMHIJson smjson = SMHIJson.FromJson(lines[0]);
+
+                    // 1. hitta rätt tid i TimeSeris[0] eller [1]
+
+                    // 2.hitta rätt Parameters[1] t.ex.där är name = "t"
+                    foreach (Parameter param in smjson.TimeSeries[1].Parameters)
+                    {
+                        if (param.Name == "t")
+                        {
+                            temperature = "" + param.Values[0];      // 3.läs Values[0] där finns en Double
+                        }
+                    }
+
+                    str += temperature + " C";
+                    await ctx.Channel.SendMessageAsync(str).ConfigureAwait(false);
+
+                }
+                catch (Exception)
+                {
+                    System.Console.WriteLine("Exception smhi!");
+                    await ctx.Channel.SendMessageAsync("Jag är Error.").ConfigureAwait(false);
                 }
             }
-        }
-
-        [Description("Test ladda ner fil")]
-        [Command("dl")]
-        public async Task dl(CommandContext ctx)
-        {
-            int result = dlFileToTempFolder("kattmåten");
-            
-            if(result != 0)
-            {
-                await ctx.Channel.SendMessageAsync("Fel vid nedladdning!").ConfigureAwait(false);
-            } else
-            {
-                await ctx.Channel.SendMessageAsync("Fil nedladdad.").ConfigureAwait(false);
-            }
-        }
-
-
-        // Register "pung" as a command with BaseCommandModule 
-        [Description("Pläpomatens utvalda favoriter!")]
-        [Command("pung")]
-        public async Task pung(CommandContext ctx)
-        {
-            // Ctx gives us access to all different things we might want, channels, client, commands, commandsNext the thing were using with config 
-            // To reply, we need the Channel
 
             
-            string str = "Vet du varför tomten har så stor pung? \n Han kommer bara en gång om året!";
-            // await before the async function makes it wait for it to complete until moving down the line
-
+         }
+         
+        
+        [Description("Statistik om skämtdatabasen")]
+        [Command("jokestats")]
+        public async Task jokestats(CommandContext ctx)
+        {
+            string filename = "./jokes.txt";
+            string[] lines = File.ReadAllLines(filename);
+            int nrLines = lines.Length; 
+            string str = "Antal skämt i db: " + nrLines; 
             await ctx.Channel.SendMessageAsync(str).ConfigureAwait(false);
         }
 
@@ -140,8 +156,9 @@ namespace kkbot.commands
 
         }
 
+
         [Command("addjoke")]
-        public async Task addjoke(CommandContext ctx, Bot botten)
+        public async Task addjoke(CommandContext ctx)
         {
             string filename = "./jokes.txt";
 
@@ -149,8 +166,7 @@ namespace kkbot.commands
             {
                 using (StreamWriter sw = File.AppendText(filename))
                 {
-                    sw.WriteLine(ctx.Message.Content.Remove(0, 9));
-                    
+                    sw.WriteLine(ctx.Message.Content.Remove(0, 9));                    
                 }
             } catch (Exception)
             {
@@ -165,31 +181,72 @@ namespace kkbot.commands
         [Command("joke")]
         public async Task joke(CommandContext ctx)
         {
-            Random random = new Random();
+            Randomizur randInst = Randomizur.Instance;
+            Memorizur memInst = Memorizur.Instance;
             string outputStr = "herpaderpa";
-
             int nr = 0;
             int nrLines = 0;
             string filename = "jokes.txt";
             int randomLineNr = 0;
-
-
             string[] lines = File.ReadAllLines(filename);
-
             nrLines = lines.Length;
-            randomLineNr = random.Next(nrLines);
+            bool keepTrying = true;
+            int maxTries = 2000;
+            int currTry = 0;
+            bool tellJoke = false;
+            DateTime prevJoked;
 
-            foreach (string line in lines)
+
+
+            // Try 2000 or so times to find a joke that has not been said
+            while (keepTrying && currTry++ < maxTries)
             {
-                if (nr++ == randomLineNr)
+                // Get random Line Number from the "jokes.txt"
+                randomLineNr = randInst.getInt(0, nrLines);
+
+
+
+                // Now try that against the memory
+                memInst.recentlyUsedJokeLineNumbers.TryGetValue(randomLineNr, out prevJoked);
+
+                // Check if we got year 1 which means there is no match in "recentlyUsedJokes"
+                
+                if(prevJoked.Year == 1)                 
                 {
-                    outputStr = line;
+                    keepTrying = false;                     // Could not find it, tell the joke!
+                    tellJoke = true;
+
                 }
-                Console.WriteLine(line);
-            } 
+                // else : This was a recently used joke, but how recent?
+                else if(prevJoked.Date < DateTime.Today)
+                {
+                    keepTrying = false;                     // It was told yesterday or earlier, go ahead, tell it :D
+                    tellJoke = true;
+                } 
+                // else : Recently used joke, today. Keep trying.
 
-            await ctx.Channel.SendMessageAsync(outputStr).ConfigureAwait(false);     
 
+            }
+
+            if(tellJoke)
+            {
+
+                // Tell joke
+                foreach (string line in lines)
+                {
+                    if (nr++ == randomLineNr)
+                    {
+                        outputStr = line;
+                    }
+                    Console.WriteLine(line);
+                }
+
+                await ctx.Channel.SendMessageAsync(outputStr).ConfigureAwait(false);
+
+
+                // Add to memory
+                memInst.recentlyUsedJokeLineNumbers.Add(randomLineNr, DateTime.Now);
+            }
         }
 
     }
