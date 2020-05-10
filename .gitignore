@@ -4,3 +4,6 @@ kkbot/obj/Debug/netcoreapp3.1/kkbot.assets.cache
 kkbot/obj/Debug/netcoreapp3.1/kkbot.csprojAssemblyReference.cache
 kkbot/obj/kkbot.csproj.nuget.dgspec.json
 kkbot/bin/Debug/netcoreapp3.1/config.json
+.vs/kkbot/DesignTimeBuild/.dtbcache.v2
+.vs/kkbot/v16/.suo
+kkbot/bin/Debug/netcoreapp3.1/temp/smhi_hagfors.txt
