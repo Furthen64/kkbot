@@ -4,6 +4,11 @@ using System.Text;
 
 
 
+/// <summary>
+/// 2020-05-12 Fungerar bra
+/// </summary>
+
+
 namespace kkbot.Singletons
 {
 

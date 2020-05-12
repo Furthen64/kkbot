@@ -13,6 +13,13 @@ using System.Threading.Tasks;
 using kkbot.Singletons;
 using System.ComponentModel.DataAnnotations;
 using kkbot.DS.SMHI;
+using System.Runtime.CompilerServices;
+using System.Threading;
+
+/// 2020.05.12  De flesta kommandon fungerar. addjoke, smhi, addjoke, jokestats. "poll" är inte så himla bra dock.
+///  
+/// 
+
 
 namespace kkbot.commands
 {
@@ -70,50 +77,141 @@ namespace kkbot.commands
 
         }
 
+
+
+        // (--) untested
+        void deleteOldSmhiFiles()
+        {
+            List<string> filenames = new List<string>();
+
+            filenames.Add("./temp/smhi_hagfors.txt");
+            filenames.Add("./temp/smhi_munkfors.txt");
+            filenames.Add("./temp/smhi_kristinehamn.txt");
+
+
+            foreach (string currFilename in filenames)
+            {
+                try
+                {
+                    if (File.Exists(currFilename))
+                    {
+                        // If file found, delete it    
+                        File.Delete(currFilename);
+                        Console.WriteLine("deleteOldSmhiFiles: File " + currFilename + " deleted.");
+                    }
+                    else Console.WriteLine("deleteOldSmhiFiles: " + currFilename + " not found ");
+                }
+                catch (IOException ioExp)
+                {
+                    Console.WriteLine(ioExp.Message);
+                }
+            }
+        }
+
+        // (-+) Funkar än så länge. 
+        // Wishlist: 
+        //      * Så den kan dra ner Munkfors och Kristinehamn också 
         [Description("Ger nuvarande temperatur i hagfors, skålviksvägen")]
         [Command("smhi")]
         public async Task smhi(CommandContext ctx)
         {
-            string filename = "./temp/smhi_hagfors.txt";
-            string str = "Temp i Hagfors nu: ";
-            string temperature = "N/A";
 
-            int result = dlFileToTempFolder("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/13.677855/lat/60.044464/data.json",
-                                           "smhi_hagfors.txt");
-            if (result == 0)
+            List<string> outputStr = new List<string>();
+            string str = "";
+            string temperature = "";
+            string finalOutString = "";
+            int milliseconds = 500;
+
+            // Preppa det som ska laddas ner
+
+            List<string> filenames = new List<string>();
+            List<string> smhiUris = new List<string>();
+            List<string> preString = new List<string>();
+
+
+            string tempFolder = @"./temp/";
+            filenames.Add("smhi_hagfors.txt");
+            smhiUris.Add("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/13.677855/lat/60.044464/data.json");
+            preString.Add("Temp i Hagfors nu: ");
+
+            filenames.Add("smhi_munkfors.txt");
+            smhiUris.Add("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/13.546200/lat/59.836500/data.json");
+            preString.Add("Temp i Munkfors nu: ");
+
+
+            filenames.Add("smhi_kristinehamn.txt");
+            smhiUris.Add("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/14.093200/lat/59.320700/data.json");
+            preString.Add("Temp i Kristinehamn nu: ");
+             
+
+
+
+
+            // Delete the old files
+            deleteOldSmhiFiles();
+
+
+
+            // Ladda ner alla smhi-jsons
+            int nr = 0;
+
+            foreach(string smhiUri in smhiUris)
             {
-                try
+                int result = dlFileToTempFolder(smhiUri,
+                                           filenames[nr]) ;
+
+                
+                Thread.Sleep(milliseconds); // Vänta ett tag så inte SMHI bannar oss? jag har ingen aning.
+
+
+                if (result == 0)
                 {
-                    // lets parse the heck out of this json file
-
-                    // Vi får lov att skapa en C# class till just SMHI:s json-fil. Så därså.
-                    string[] lines = File.ReadAllLines(filename);// WORRY MAYBE IS TOO BIG FILE YA?
-                    SMHIJson smjson = SMHIJson.FromJson(lines[0]);
-
-                    // 1. hitta rätt tid i TimeSeris[0] eller [1]
-
-                    // 2.hitta rätt Parameters[1] t.ex.där är name = "t"
-                    foreach (Parameter param in smjson.TimeSeries[1].Parameters)
+                    try
                     {
-                        if (param.Name == "t")
+                        // lets parse the heck out of this json file
+
+                        // Vi får lov att skapa en C# class till just SMHI:s json-fil. Så därså.
+                        string[] lines = File.ReadAllLines(tempFolder + filenames[nr]);                  // WORRY MAYBE IS TOO BIG FILE YA?
+                        SMHIJson smjson = SMHIJson.FromJson(lines[0]);
+
+                        // 1. hitta rätt tid i TimeSeris[0] eller [1]
+
+                        // 2.hitta rätt Parameters[1] t.ex.där är name = "t"
+                        foreach (Parameter param in smjson.TimeSeries[1].Parameters)
                         {
-                            temperature = "" + param.Values[0];      // 3.läs Values[0] där finns en Double
+                            if (param.Name == "t")
+                            {
+                                outputStr.Add("" + preString[nr] + param.Values[0] + " C");
+                            }
                         }
+                         
+
                     }
-
-                    str += temperature + " C";
-                    await ctx.Channel.SendMessageAsync(str).ConfigureAwait(false);
-
+                    catch (Exception)
+                    {
+                        System.Console.WriteLine("Exception smhi!");
+                        await ctx.Channel.SendMessageAsync("Jag är Error.").ConfigureAwait(false);
+                    }
                 }
-                catch (Exception)
-                {
-                    System.Console.WriteLine("Exception smhi!");
-                    await ctx.Channel.SendMessageAsync("Jag är Error.").ConfigureAwait(false);
-                }
+                nr++;
+
             }
 
-            
-         }
+
+            // Done? Yes, låt oss skriva till kanal
+
+            foreach(string outStr in outputStr)
+            {
+                finalOutString += outStr + "\n";
+            }
+
+
+            await ctx.Channel.SendMessageAsync(finalOutString).ConfigureAwait(false);
+
+
+
+
+        }
          
         
         [Description("Statistik om skämtdatabasen")]
