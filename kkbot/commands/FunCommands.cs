@@ -16,6 +16,7 @@ using kkbot.DS.SMHI;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
+/// 2020.06.26 Haft nåt strul med !joke, att den inte minns skämt den redan dragit samma dag.. Men testade nu och det verkar fungera. 
 /// 2020.05.12  De flesta kommandon fungerar. addjoke, smhi, addjoke, jokestats. "poll" är inte så himla bra dock.
 ///  
 /// 
@@ -111,7 +112,7 @@ namespace kkbot.commands
         // (-+) Funkar än så länge. 
         // Wishlist: 
         //      * Så den kan dra ner Munkfors och Kristinehamn också 
-        [Description("Ger nuvarande temperatur i hagfors, skålviksvägen")]
+        [Description("Ger nuvarande temperatur i tre städer. Detta är beräknade värden, inte siffror från en väderstation.")]
         [Command("smhi")]
         public async Task smhi(CommandContext ctx)
         {
@@ -127,6 +128,23 @@ namespace kkbot.commands
             List<string> filenames = new List<string>();
             List<string> smhiUris = new List<string>();
             List<string> preString = new List<string>();
+
+
+
+            // Om vi vill få ner data om senaste timme från en väderstation:
+
+            //              GET / api / version /{ version}/ parameter /{ parameter}/ station /{ station}/ period /{ period}.{ ext}
+            //                                                                       103090                       period= latest-hour
+
+            // Example: https://opendata-download-metfcst.smhi.se/api/version/1.0/parameter/1/station/159880.json
+            // Example: https://opendata-download-metobs.smhi.se/api/version/1.0/parameter/1/station/159880.json
+            // använd då SMHIStationJSon.cs klassen
+
+
+
+
+
+
 
 
             string tempFolder = @"./temp/";
@@ -153,6 +171,8 @@ namespace kkbot.commands
 
 
             // Ladda ner alla smhi-jsons
+            // Parsa filerna 
+            // Lägg den relevanta informationen i sträng-arrayen "outputStr"
             int nr = 0;
 
             foreach(string smhiUri in smhiUris)
@@ -198,22 +218,19 @@ namespace kkbot.commands
             }
 
 
-            // Done? Yes, låt oss skriva till kanal
+            // Samla ihop alla delsträngar till en slutsträng och skriv till kanal.
 
             foreach(string outStr in outputStr)
             {
                 finalOutString += outStr + "\n";
             }
 
-
             await ctx.Channel.SendMessageAsync(finalOutString).ConfigureAwait(false);
-
-
-
 
         }
          
         
+        // (++)
         [Description("Statistik om skämtdatabasen")]
         [Command("jokestats")]
         public async Task jokestats(CommandContext ctx)
@@ -266,7 +283,10 @@ namespace kkbot.commands
                 {
                     sw.WriteLine(ctx.Message.Content.Remove(0, 9));                    
                 }
-            } catch (Exception)
+                await ctx.Channel.SendMessageAsync("KUL").ConfigureAwait(false);
+
+            }
+            catch (Exception)
             {
                 await ctx.Channel.SendMessageAsync("Barka käpprätt åt helvete. Systemfel!").ConfigureAwait(false);
 
@@ -276,6 +296,7 @@ namespace kkbot.commands
 
 
 
+        // (+-)
         [Command("joke")]
         public async Task joke(CommandContext ctx)
         {

@@ -85,7 +85,7 @@ namespace kkbot.DS.SMHI
     {
         public static SMHIJson FromJson(string json) => JsonConvert.DeserializeObject<SMHIJson>(json, kkbot.DS.SMHI.Converter.Settings);
     }
-
+    /*
     public static class Serialize
     {
         public static string ToJson(this SMHIJson self) => JsonConvert.SerializeObject(self, kkbot.DS.SMHI.Converter.Settings);
@@ -104,7 +104,7 @@ namespace kkbot.DS.SMHI
             },
         };
     }
-
+    */
     internal class LevelTypeConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(LevelType) || t == typeof(LevelType?);
