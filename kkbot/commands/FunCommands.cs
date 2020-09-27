@@ -117,9 +117,7 @@ namespace kkbot.commands
         public async Task smhi(CommandContext ctx)
         {
 
-            List<string> outputStr = new List<string>();
-            string str = "";
-            string temperature = "";
+            List<string> outputStr = new List<string>();            
             string finalOutString = "";
             int milliseconds = 500;
 
@@ -326,11 +324,11 @@ namespace kkbot.commands
 
 
                 // Now try that against the memory
-                memInst.recentlyUsedJokeLineNumbers.TryGetValue(randomLineNr, out prevJoked);
+                memInst.recentlyUsedJokeLineNumbers.TryGetValue(randomLineNr, out prevJoked);                
 
                 // Check if we got year 1 which means there is no match in "recentlyUsedJokes"
-                
-                if(prevJoked.Year == 1)                 
+
+                if (prevJoked.Year == 1)                 
                 {
                     keepTrying = false;                     // Could not find it, tell the joke!
                     tellJoke = true;
@@ -367,6 +365,118 @@ namespace kkbot.commands
                 memInst.recentlyUsedJokeLineNumbers.Add(randomLineNr, DateTime.Now);
             }
         }
+
+
+
+
+        // (--)
+        [Command("quote")]
+        public async Task quote(CommandContext ctx)
+        {
+            Randomizur randInst = Randomizur.Instance;
+            Memorizur memInst = Memorizur.Instance;
+            string outputStr = "herpaderpa";
+            int nr = 0;
+            int nrLines = 0;
+            string filename = "moviequotes.txt";
+            int randomLineNr = 0;
+
+            // TODO: Lägg till denna try catch block till joke också
+            string[] lines = null;
+
+            try
+            {
+                lines = File.ReadAllLines(filename);
+            }
+            catch(Exception)
+            {
+                await ctx.Channel.SendMessageAsync("Barka käpprätt åt helvete. Systemfel!").ConfigureAwait(false);
+            }
+            nrLines = lines.Length;
+            bool keepTrying = true;
+            int maxTries = 2000;
+            int currTry = 0;
+            bool tellquote = false;
+            DateTime prevquoted;
+
+            // Try 2000 or so times to find a quote that has not been said
+            while (keepTrying && currTry++ < maxTries)
+            {
+                // Get random Line Number from the textfile
+                randomLineNr = randInst.getInt(0, nrLines);
+
+
+                // Now try that against the memory
+                memInst.recentlyUsedQuoteLineNumbers.TryGetValue(randomLineNr, out prevquoted);
+
+                // Check if we got year 1 which means there is no match in "recentlyUsedquotes"
+                if (prevquoted.Year == 1)
+                {
+                    keepTrying = false;                     // Could not find it, tell the quote!
+                    tellquote = true;
+
+                }
+                // else : This was a recently used quote, but how recent?
+                else if (prevquoted.Date < DateTime.Today)
+                {
+                    keepTrying = false;                     // It was told yesterday or earlier, go ahead, tell it :D
+                    tellquote = true;
+                }
+                // else : Recently used quote, today. Keep trying.
+
+
+            }
+
+            if (tellquote)
+            {
+
+                // Tell quote
+                foreach (string line in lines)
+                {
+                    if (nr++ == randomLineNr)
+                    {
+                        outputStr = line;
+                    }
+                    Console.WriteLine(line);
+                }
+
+                await ctx.Channel.SendMessageAsync(outputStr).ConfigureAwait(false);
+
+
+                // Add to memory
+                memInst.recentlyUsedQuoteLineNumbers.Add(randomLineNr, DateTime.Now);
+            }
+        }
+
+
+
+
+        [Command("addquote")]
+        public async Task addquote(CommandContext ctx)
+        {
+            string filename = "./moviequotes.txt";
+
+            try
+            {
+                using (StreamWriter sw = File.AppendText(filename))
+                {
+                    sw.WriteLine(ctx.Message.Content.Remove(0, 9));
+                }
+                await ctx.Channel.SendMessageAsync("You've made me an offer I can't refuse. Quote added!").ConfigureAwait(false);
+
+            }
+            catch (Exception)
+            {
+                await ctx.Channel.SendMessageAsync("Barka käpprätt åt helvete. Systemfel!").ConfigureAwait(false);
+
+            }
+        }
+
+
+
+
+
+
 
     }
 }
