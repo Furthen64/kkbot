@@ -88,6 +88,7 @@ namespace kkbot.commands
             filenames.Add("./temp/smhi_hagfors.txt");
             filenames.Add("./temp/smhi_munkfors.txt");
             filenames.Add("./temp/smhi_kristinehamn.txt");
+            filenames.Add("./temp/smhi_ojebyn.txt");
 
 
             foreach (string currFilename in filenames)
@@ -158,8 +159,12 @@ namespace kkbot.commands
             filenames.Add("smhi_kristinehamn.txt");
             smhiUris.Add("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/14.093200/lat/59.320700/data.json");
             preString.Add("Temp i Kristinehamn nu: ");
-             
 
+
+            filenames.Add("smhi_ojebyn.txt");
+            smhiUris.Add("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/21.40395/lat/65.347303/data.json");
+            preString.Add("Temp i Öjebyn nu: ");
+             
 
 
 
