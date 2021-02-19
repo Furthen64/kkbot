@@ -8,7 +8,9 @@ This is a bot made in C# for our discord server "Hagfors Spelnätverk"
 
 What you need to get it to work:
 
-* When installing Visual Studio 2017, make sure you select the .NET Core cross-platform development option.
+* When installing Visual Studio Community, make sure you select the:
+ [x] .NET Core cross-platform development option.
+
 * Startup Visual Studio Community IDE
 - Install nuget 'Newtonsoft.Json'
 - Add another Nuget source:
