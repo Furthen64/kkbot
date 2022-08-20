@@ -37,4 +37,16 @@ C:\github\kkbot\kkbot\obj\Debug\netcoreapp3.1\kkbot.dll
 C:\github\kkbot\kkbot\obj\Debug\netcoreapp3.1\kkbot.pdb
 C:\github\kkbot\kkbot\obj\Debug\netcoreapp3.1\kkbot.genruntimeconfig.cache
 C:\github\kkbot\kkbot\obj\Debug\netcoreapp3.1\kkbot.csproj.CoreCompileInputs.cache
-C:\github\kkbot\kkbot\obj\Debug\netcoreapp3.1\kkbot.csprojAssemblyReference.cache
+C:\github\kkbot\kkbot\obj\Debug\netcoreapp3.1\kkbot.csproj.AssemblyReference.cache
+C:\github\kkbot\kkbot\obj\Debug\netcoreapp3.1\kkbot.GeneratedMSBuildEditorConfig.editorconfig
+C:\github\kkbot\kkbot\bin\Debug\netcoreapp3.1\ConcurrentCollections.dll
+C:\github\kkbot\kkbot\bin\Debug\netcoreapp3.1\DSharpPlus.VoiceNext.dll
+C:\github\kkbot\kkbot\bin\Debug\netcoreapp3.1\Emzi0767.Common.dll
+C:\github\kkbot\kkbot\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Logging.Abstractions.dll
+C:\github\kkbot\kkbot\bin\Debug\netcoreapp3.1\System.Collections.Immutable.dll
+C:\github\kkbot\kkbot\bin\Debug\netcoreapp3.1\System.Runtime.CompilerServices.Unsafe.dll
+C:\github\kkbot\kkbot\bin\Debug\netcoreapp3.1\System.Threading.Channels.dll
+C:\github\kkbot\kkbot\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\libopus.dll
+C:\github\kkbot\kkbot\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\libsodium.dll
+C:\github\kkbot\kkbot\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\libopus.dll
+C:\github\kkbot\kkbot\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\libsodium.dll

@@ -2,6 +2,8 @@
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Enums;
+using DSharpPlus.Interactivity.EventHandling;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,7 +17,9 @@ using System.ComponentModel.DataAnnotations;
 using kkbot.DS.SMHI;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using DSharpPlus.Interactivity.Extensions;
 
+/// 2022.08.20 Behövde uppdatera libs igen :) 
 /// 2020.06.26 Haft nåt strul med !joke, att den inte minns skämt den redan dragit samma dag.. Men testade nu och det verkar fungera. 
 /// 2020.05.12  De flesta kommandon fungerar. addjoke, smhi, addjoke, jokestats. "poll" är inte så himla bra dock.
 ///  
@@ -80,7 +84,7 @@ namespace kkbot.commands
 
 
 
-        // (--) untested
+        // (-+) tested
         void deleteOldSmhiFiles()
         {
             List<string> filenames = new List<string>();
@@ -110,9 +114,10 @@ namespace kkbot.commands
             }
         }
 
-        // (-+) Funkar än så länge. 
-        // Wishlist: 
-        //      * Så den kan dra ner Munkfors och Kristinehamn också 
+
+
+        // (-+) Funkar än så länge        
+        
         [Description("Ger nuvarande temperatur i tre städer. Detta är beräknade värden, inte siffror från en väderstation.")]
         [Command("smhi")]
         public async Task smhi(CommandContext ctx)
@@ -248,7 +253,12 @@ namespace kkbot.commands
         [Command("poll")]
         public async Task poll(CommandContext ctx, TimeSpan duration, params DiscordEmoji [] emojiOptions )
         {
-            var interactivity = ctx.Client.GetInteractivity();
+         
+        
+        // var interactivity = ctx.Client.GetInteractivity() they moved the getINteractivity somewhere else
+        // 
+        var interactivity = Client​Extensions.GetInteractivity(ctx.Client);
+            
             var options = emojiOptions.Select(x => x.ToString());
 
             var pollEmbed = new DiscordEmbedBuilder

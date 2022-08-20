@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using kkbot.commands;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Extensions;
 
 namespace kkbot
 {
@@ -33,9 +34,7 @@ namespace kkbot
         {
 
             Console.WriteLine(" *** BOOTING BOT *** ");
-            outMessages = new OutgoingMessages();
-            
-
+            outMessages = new OutgoingMessages(); 
 
             var json = string.Empty;
             string fileName = "./config.json";
@@ -56,30 +55,38 @@ namespace kkbot
 
             // Now deserialize and convert the json to our Struct
             var configJson = JsonConvert.DeserializeObject<ConfigJson>(json);
+            
+            
 
 
-            // // Load up the "config.json" and populate this config object
+            // Load up the "config.json" and populate this config object
             var config = new DiscordConfiguration
             {
                 Token = configJson.Token,
                 TokenType = TokenType.Bot,
-                AutoReconnect = true,
-                LogLevel = LogLevel.Debug,
-                UseInternalLogHandler = true
+                AutoReconnect = true, 
             };
+
+            //  MinimumLogLevel = 
+             // LogLevel = LogLevel.Debug,      deleted 2022.08.20 due to changes to DSharp
+            // UseInternalLogHandler = true
 
             
             client = new DiscordClient(config);
 
-            client.UseInteractivity(new InteractivityConfiguration()
-            {
-                Timeout = TimeSpan.FromMinutes(2)
+            var interactivity = Client​Extensions.GetInteractivity(client);
 
-            }) ;
+            ClientExtensions.UseInteractivity(client, new InteractivityConfiguration()
+                                                  {
+                                                    Timeout = TimeSpan.FromMinutes(2) 
+                                                  });
+
+ 
+            
 
 
             // Assign a function to run whenever the Client reaches the "Ready" state
-            client.Ready += onClientReady;
+            // client.Ready += onClientReady;
 
             var commandsConfig = new CommandsNextConfiguration
             {
