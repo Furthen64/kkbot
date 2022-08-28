@@ -19,6 +19,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using DSharpPlus.Interactivity.Extensions;
 
+/// 2022.08.20 lägger till Recommend för spel och serier och sånt
 /// 2022.08.20 Behövde uppdatera libs igen :) 
 /// 2020.06.26 Haft nåt strul med !joke, att den inte minns skämt den redan dragit samma dag.. Men testade nu och det verkar fungera. 
 /// 2020.05.12  De flesta kommandon fungerar. addjoke, smhi, addjoke, jokestats. "poll" är inte så himla bra dock.
@@ -30,11 +31,83 @@ namespace kkbot.commands
 {
     public class FunCommands : BaseCommandModule
     {
+        [Command("addtips")] 
+
+        public async Task addTips(CommandContext ctx)
+        {
+            string filename = "./tips.txt";
+
+            try
+            {
+                using (StreamWriter sw = File.AppendText(filename))
+                {
+                    sw.WriteLine(ctx.Message.Content.Remove(0,6));
+                }
+                await ctx.Channel.SendMessageAsync("bra där").ConfigureAwait(false);
+
+            }
+            catch (Exception)
+            {
+                await ctx.Channel.SendMessageAsync("Barka käpprätt åt helvete. Systemfel!").ConfigureAwait(false);
+
+            }
+        }
+          
+        [Command("tips")]
+        public async Task findTips(CommandContext ctx)
+        {
+          string filename = "./tips.txt";
+          string resultStr = "";
+
+          List<string> result = new List<string>();
+           
+          string[] lines = File.ReadAllLines(filename);   
 
 
-        // returns 0 on OK
-        // (-+) seems to work
-        private int dlFileToTempFolder(string uriStr, string outputFilename)
+          foreach(string str in lines) 
+          { 
+            Console.WriteLine(str.ToLowerInvariant());
+            Console.WriteLine( ctx.Message.Content.Remove(0, 9).ToLowerInvariant());
+         
+
+            // "!söktips "
+            // "123456789"
+
+            if(str.ToLowerInvariant().IndexOf( ctx.Message.Content.Remove(0, 9).ToLowerInvariant() ) != -1) {
+              result.Add(str);
+            }
+          }
+
+       
+          resultStr = "";
+          foreach(string str in result) 
+          {
+            resultStr += str + "\n"; 
+
+          }
+
+
+          if(resultStr.Equals("")) {
+            resultStr = "nothing found."; 
+          }
+
+
+
+          // Reply to channel
+          try
+          { 
+              await ctx.Channel.SendMessageAsync(resultStr).ConfigureAwait(false); 
+          }
+          catch (Exception)
+          {
+              await ctx.Channel.SendMessageAsync("Barka käpprätt åt helvete. Systemfel findTips()").ConfigureAwait(false); 
+          }
+           
+        }
+
+    // returns 0 on OK
+    // (-+) seems to work
+    private int dlFileToTempFolder(string uriStr, string outputFilename)
         {
             string errorStr = "";
             int errorCode = 0;
@@ -130,7 +203,9 @@ namespace kkbot.commands
             // Preppa det som ska laddas ner
 
             List<string> filenames = new List<string>();
+
             List<string> smhiUris = new List<string>();
+
             List<string> preString = new List<string>();
 
 
@@ -381,6 +456,137 @@ namespace kkbot.commands
             }
         }
 
+        
+        [Command("hälga")]
+        public async Task helg4(CommandContext ctx)
+        {
+          await helg(ctx);
+        }
+
+        
+        [Command("helg")]
+        public async Task helg3(CommandContext ctx)
+        {
+          await helg(ctx);
+        }
+
+        [Command("helga")]
+        public async Task helg2(CommandContext ctx)
+        {
+          await helg(ctx);
+        }
+
+        // (--) 
+
+        [Command("hälja")]
+        public async Task helg(CommandContext ctx)
+        {
+            Randomizur randInst = Randomizur.Instance;
+            Memorizur memInst = Memorizur.Instance;
+            string outputStr = "herpaderpa";
+            int nr = 0;
+            int nrLines = 0;
+            string filename = "helg.txt";
+            int randomLineNr = 0;
+
+            // TODO: Lägg till denna try catch block till joke också
+            string[] lines = null;
+
+            try
+            {
+                lines = File.ReadAllLines(filename);
+            }
+            catch(Exception)
+            {
+                await ctx.Channel.SendMessageAsync("Barka käpprätt åt helvete. Systemfel!").ConfigureAwait(false);
+            }
+            nrLines = lines.Length;
+            bool keepTrying = true;
+            int maxTries = 2000;
+            int currTry = 0;
+            bool tellquote = false;
+            DateTime prevquoted;
+
+            // Try 2000 or so times to find a quote that has not been said
+            while (keepTrying && currTry++ < maxTries)
+            {
+                // Get random Line Number from the textfile
+                randomLineNr = randInst.getInt(0, nrLines);
+
+
+                // Now try that against the memory
+                memInst.recentlyUsedHelgLineNumbers.TryGetValue(randomLineNr, out prevquoted);
+
+                // Check if we got year 1 which means there is no match in "recentlyUsedquotes"
+                if (prevquoted.Year == 1)
+                {
+                    keepTrying = false;                     // Could not find it, tell the quote!
+                    tellquote = true;
+
+                }
+                // else : This was a recently used quote, but how recent?
+                else if (prevquoted.Date < DateTime.Today)
+                {
+                    keepTrying = false;                     // It was told yesterday or earlier, go ahead, tell it :D
+                    tellquote = true;
+                }
+                // else : Recently used quote, today. Keep trying.
+
+
+            }
+
+            if (tellquote)
+            {
+
+                // Tell quote
+                foreach (string line in lines)
+                {
+                    if (nr++ == randomLineNr)
+                    {
+                        outputStr = line;
+                    }
+                    Console.WriteLine(line);
+                }
+
+                await ctx.Channel.SendMessageAsync(outputStr).ConfigureAwait(false);
+
+
+                // Add to memory
+                memInst.recentlyUsedHelgLineNumbers.Add(randomLineNr, DateTime.Now);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+        [Command("addhelg")]
+        public async Task addhelg(CommandContext ctx)
+        {
+            string filename = "./helg.txt";
+
+            try
+            {
+                using (StreamWriter sw = File.AppendText(filename))
+                {
+                    sw.WriteLine(ctx.Message.Content.Remove(0, 9));
+                }
+                await ctx.Channel.SendMessageAsync("Helgen är räddad!").ConfigureAwait(false);
+
+            }
+            catch (Exception)
+            {
+                await ctx.Channel.SendMessageAsync("Barka käpprätt åt helvete. Systemfel!").ConfigureAwait(false);
+
+            }
+        }
+         
 
 
 
@@ -486,11 +692,7 @@ namespace kkbot.commands
 
             }
         }
-
-
-
-
-
+         
 
 
     }

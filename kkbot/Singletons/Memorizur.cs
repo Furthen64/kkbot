@@ -26,6 +26,7 @@ namespace kkbot.Singletons
         {
             recentlyUsedJokeLineNumbers = new Dictionary<int, DateTime>();
             recentlyUsedQuoteLineNumbers = new Dictionary<int, DateTime>();
+            recentlyUsedHelgLineNumbers = new Dictionary<int, DateTime>();
         }
 
         public static Memorizur Instance { get { return Nested.instance; } }
@@ -35,6 +36,7 @@ namespace kkbot.Singletons
         // Non Singleton stuff:
         public Dictionary <int, DateTime> recentlyUsedJokeLineNumbers;
         public Dictionary<int, DateTime> recentlyUsedQuoteLineNumbers;
+        public Dictionary<int, DateTime> recentlyUsedHelgLineNumbers;
 
 
 
