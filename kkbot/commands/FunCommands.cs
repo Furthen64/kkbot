@@ -18,21 +18,124 @@ using kkbot.DS.SMHI;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using DSharpPlus.Interactivity.Extensions;
+using System.Text.Json;
 
-/// 2022.08.20 lägger till Recommend för spel och serier och sånt
-/// 2022.08.20 Behövde uppdatera libs igen :) 
-/// 2020.06.26 Haft nåt strul med !joke, att den inte minns skämt den redan dragit samma dag.. Men testade nu och det verkar fungera. 
-/// 2020.05.12  De flesta kommandon fungerar. addjoke, smhi, addjoke, jokestats. "poll" är inte så himla bra dock.
-///  
-/// 
+
+// 2024.09.20 Förbättra !smhi
+// 2022.08.20 lägger till Recommend för spel och serier och sånt
+// 2022.08.20 Behövde uppdatera libs igen :) 
+// 2020.06.26 Haft nåt strul med !joke, att den inte minns skämt den redan dragit samma dag.. Men testade nu och det verkar fungera. 
+// 2020.05.12  De flesta kommandon fungerar. addjoke, smhi, addjoke, jokestats. "poll" är inte så himla bra dock.
+
 
 
 namespace kkbot.commands
 {
     public class FunCommands : BaseCommandModule
     {
-        [Command("addtips")] 
+      [Command("addsemester")]
+      public async Task addsemester(CommandContext ctx)
+      {
+        string filename = "./semester.txt";
 
+        try
+        {
+          using (StreamWriter sw = File.AppendText(filename))
+          {
+            sw.WriteLine(ctx.Message.Content.Remove(0, 9));
+          }
+          await ctx.Channel.SendMessageAsync("Äntligen!").ConfigureAwait(false);
+
+        }
+        catch (Exception)
+        {
+          await ctx.Channel.SendMessageAsync("Barka käpprätt åt helvete. Systemfel!").ConfigureAwait(false);
+
+        }
+      }
+
+
+
+
+      [Command("semester")]
+      public async Task semester(CommandContext ctx)
+      {
+        Randomizur randInst = Randomizur.Instance;
+        Memorizur memInst = Memorizur.Instance;
+        string outputStr = "herpaderpa";
+        int nr = 0;
+        int nrLines = 0;
+        string filename = "semester.txt";
+        int randomLineNr = 0;
+       
+        string[] lines = null;
+
+        try
+        {
+          lines = File.ReadAllLines(filename);
+        }
+        catch (Exception)
+        {
+          await ctx.Channel.SendMessageAsync("Barka käpprätt åt helvete. Systemfel!").ConfigureAwait(false);
+        }
+        nrLines = lines.Length;
+        bool keepTrying = true;
+        int maxTries = 2000;
+        int currTry = 0;
+        bool tellquote = false;
+        DateTime prevquoted;
+
+        // Try 2000 or so times to find a quote that has not been said
+        while (keepTrying && currTry++ < maxTries)
+        {
+          // Get random Line Number from the textfile
+          randomLineNr = randInst.getInt(0, nrLines);
+
+
+          // Now try that against the memory
+          memInst.recentlyUsedSemesterLineNumbers.TryGetValue(randomLineNr, out prevquoted);
+
+          // Check if we got year 1 which means there is no match in "recentlyUsedquotes"
+          if (prevquoted.Year == 1)
+          {
+            keepTrying = false;                     // Could not find it, tell the quote!
+            tellquote = true;
+
+          }
+          // else : This was a recently used quote, but how recent?
+          else if (prevquoted.Date < DateTime.Today)
+          {
+            keepTrying = false;                     // It was told yesterday or earlier, go ahead, tell it :D
+            tellquote = true;
+          }
+          // else : Recently used quote, today. Keep trying.
+
+
+        }
+
+        if (tellquote)
+        {
+
+          // Tell quote
+          foreach (string line in lines)
+          {
+            if (nr++ == randomLineNr)
+            {
+              outputStr = line;
+            }
+            Console.WriteLine(line);
+          }
+
+          await ctx.Channel.SendMessageAsync(outputStr).ConfigureAwait(false);
+
+
+          // Add to memory
+          memInst.recentlyUsedSemesterLineNumbers.Add(randomLineNr, DateTime.Now);
+        }
+      }
+
+
+        [Command("addtips")] 
         public async Task addTips(CommandContext ctx)
         {
             string filename = "./tips.txt";
@@ -106,59 +209,98 @@ namespace kkbot.commands
         }
 
     // returns 0 on OK
-    // (-+) seems to work
+    // (--) 
     private int dlFileToTempFolder(string uriStr, string outputFilename)
+    {
+      // Decide on your temp folder
+      string tempFolder = "./temp/";
+
+      try
+      {
+        // Check if the directory exists; if not, create it
+        if (!Directory.Exists(tempFolder))
         {
-            string errorStr = "";
-            int errorCode = 0;
-
-            string tempFolder = @"./temp/";
-            try
-            {
-                if (!System.IO.File.Exists(tempFolder)) {
-
-                    System.IO.Directory.CreateDirectory(tempFolder);
-                }
-
-            }
-            catch(Exception)
-            {
-                errorCode = -1;
-                errorStr = "Could not create temp folder!";
-            }
-
-            try
-            {
-
-                // Try to dl with webclient library
-                string address = uriStr;
-                string fileName = tempFolder + outputFilename;
-                Console.WriteLine("smhi: Downloaded to " + fileName);
-
-                WebClient client = new WebClient();
-                client.DownloadFile(address, fileName);
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e.Message);
-              
-            }
-
-            if (errorCode != 0)
-            {
-                Console.WriteLine(errorStr);
-                Console.WriteLine("error with dlFileToTempFolder() !");
-
-                return -1;
-            }
-            return 0;
-
+          Directory.CreateDirectory(tempFolder);
         }
 
+        // Build the full file path
+        string filePath = Path.Combine(tempFolder, outputFilename);
+
+        // Log what we're about to do
+        Console.WriteLine($"Downloading file from '{uriStr}' to '{filePath}' ...");
+
+        // Use a WebClient in a using block so it disposes automatically
+        using (WebClient client = new WebClient())
+        {
+          client.DownloadFile(uriStr, filePath);
+        }
+
+        Console.WriteLine("Download succeeded!");
+        return 0; // success
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"Error in dlFileToTempFolder: {ex.Message}");
+        return -1; // failure
+      }
+    }
 
 
-        // (-+) tested
-        void deleteOldSmhiFiles()
+
+
+    //Old
+    // private int dlFileToTempFolder(string uriStr, string outputFilename)
+    //{
+    //    string errorStr = "";
+    //    int errorCode = 0;
+
+    //    string tempFolder = @"./temp/";
+    //    try
+    //    {
+    //        if (!System.IO.File.Exists(tempFolder)) {
+
+    //            System.IO.Directory.CreateDirectory(tempFolder);
+    //        }
+
+    //    }
+    //    catch(Exception)
+    //    {
+    //        errorCode = -1;
+    //        errorStr = "Could not create temp folder!";
+    //    }
+
+    //    try
+    //    {
+
+    //        // Try to dl with webclient library
+    //        string address = uriStr;
+    //        string fileName = tempFolder + outputFilename;
+    //        Console.WriteLine("smhi: Downloaded to " + fileName);
+
+    //        WebClient client = new WebClient();
+    //        client.DownloadFile(address, fileName);
+    //    }
+    //    catch(Exception e)
+    //    {
+    //        Console.WriteLine(e.Message);
+
+    //    }
+
+    //    if (errorCode != 0)
+    //    {
+    //        Console.WriteLine(errorStr);
+    //        Console.WriteLine("error with dlFileToTempFolder() !");
+
+    //        return -1;
+    //    }
+    //    return 0;
+
+    //}
+
+
+
+    // (-+) tested
+    void deleteOldSmhiFiles()
         {
             List<string> filenames = new List<string>();
 
@@ -199,122 +341,246 @@ namespace kkbot.commands
             List<string> outputStr = new List<string>();            
             string finalOutString = "";
             int milliseconds = 500;
-
-            // Preppa det som ska laddas ner
-
-            List<string> filenames = new List<string>();
-
-            List<string> smhiUris = new List<string>();
-
-            List<string> preString = new List<string>();
+                                          
 
 
 
-            // Om vi vill få ner data om senaste timme från en väderstation:
+      // Om vi vill få ner data om senaste timme från en väderstation, kör GET mot denna:
 
-            //              GET / api / version /{ version}/ parameter /{ parameter}/ station /{ station}/ period /{ period}.{ ext}
-            //                                                                       103090                       period= latest-hour
+      //              GET / api / version /{ version}/ parameter /{ parameter}/ station /{ station}/ period /{ period}.{ ext}
+      //                                                                       103090                       period= latest-hour
 
-            // Example: https://opendata-download-metfcst.smhi.se/api/version/1.0/parameter/1/station/159880.json
-            // Example: https://opendata-download-metobs.smhi.se/api/version/1.0/parameter/1/station/159880.json
-            // använd då SMHIStationJSon.cs klassen
+      // Example: https://opendata-download-metfcst.smhi.se/api/version/1.0/parameter/1/station/159880.json
+      // Example: https://opendata-download-metobs.smhi.se/api/version/1.0/parameter/1/station/159880.json
+      // använd då SMHIStationJSon.cs klassen
 
 
 
 
+      /*
+      *      Förklaring av koderna i jsonen:
+      *      https://opendata.smhi.se/apidocs/metfcst/parameters.html#parameter-table
+      * 
+      *    behöver emote för alla de här'
+      *    wsymb2 	code 	hl 	0 	Weather symbol 	Integer, 1-27
+      1   Clear sky
+      2 	Nearly clear sky              
+      3 	Variable cloudiness
+      4 	Halfclear sky
+      5 	Cloudy sky
+      6 	Overcast
+      7 	Fog
+      8 	Light rain showers
+      9 	Moderate rain showers
+      10 	Heavy rain showers
+      11 	Thunderstorm
+      12 	Light sleet showers
+      13 	Moderate sleet showers
+      14 	Heavy sleet showers
+      15 	Light snow showers
+      16 	Moderate snow showers
+      17 	Heavy snow showers
+      18 	Light rain
+      19 	Moderate rain
+      20 	Heavy rain
+      21 	Thunder
+      22 	Light sleet
+      23 	Moderate sleet
+      24 	Heavy sleet
+      25 	Light snowfall
+      26 	Moderate snowfall
+      27 	Heavy snowfall
+      * */
 
 
 
-
-            string tempFolder = @"./temp/";
-            filenames.Add("smhi_hagfors.txt");
-            smhiUris.Add("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/13.677855/lat/60.044464/data.json");
-            preString.Add("Temp i Hagfors nu: ");
-
-            filenames.Add("smhi_munkfors.txt");
-            smhiUris.Add("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/13.546200/lat/59.836500/data.json");
-            preString.Add("Temp i Munkfors nu: ");
-
-
-            filenames.Add("smhi_kristinehamn.txt");
-            smhiUris.Add("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/14.093200/lat/59.320700/data.json");
-            preString.Add("Temp i Kristinehamn nu: ");
-
-
-            filenames.Add("smhi_ojebyn.txt");
-            smhiUris.Add("https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/21.40395/lat/65.347303/data.json");
-            preString.Add("Temp i Öjebyn nu: ");
-             
+      string tempFolder = @"./temp/";
 
 
 
-            // Delete the old files
-            deleteOldSmhiFiles();
+      //
+      // New AI code to read from json file instead of hardcoded     
+      //
 
 
+      // Filen innehåller saker, så vi måste läsa upp filen, filen läser upp till datastrukturer som är en SMHIBotData -3x strings
 
-            // Ladda ner alla smhi-jsons
-            // Parsa filerna 
-            // Lägg den relevanta informationen i sträng-arrayen "outputStr"
-            int nr = 0;
+      string json = "";
+      try
+      {
+        json = File.ReadAllText($"{tempFolder}smhidata.json");
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine(ex.ToString());
+        await ctx.Channel.SendMessageAsync("Could not find smhidata.json").ConfigureAwait(false);
+        return;
+      }
 
-            foreach(string smhiUri in smhiUris)
+
+      List<SMHIBotData> smhiDataList = null;
+      try
+      {
+        smhiDataList = JsonSerializer.Deserialize<List<SMHIBotData>>(json);
+        Console.WriteLine("smhibotdata in json file:");
+
+        foreach (var item in smhiDataList)
+        {
+          Console.WriteLine($"{item.Filename} {item.OutputPreString} {item.OutputPostString} {item.SmhiUri}");
+        }
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine(ex.ToString());
+        await ctx.Channel.SendMessageAsync("Could not parse smhidata.json").ConfigureAwait(false);
+        return;
+      }
+            
+      deleteOldSmhiFiles(); // Do this before we start the new downloads below
+
+
+      // Now:
+      // - Download smhi json file for each item
+      // - Parse it
+      // - Prepare output string
+
+      Console.WriteLine("Downloading.");
+      foreach (var item in smhiDataList)
+      {
+        Console.WriteLine($"Downloading {item.Filename} {item.OutputPreString} {item.OutputPostString} {item.SmhiUri}");
+
+        int result = dlFileToTempFolder(item.SmhiUri, item.Filename);
+
+        Thread.Sleep(milliseconds);
+
+        if(result ==0)
+        {
+          try
+          {
+            // lets parse the heck out of this json file
+
+            // Vi får lov att skapa en C# class till just SMHI:s json-fil.  
+            string[] lines = File.ReadAllLines(tempFolder + item.Filename);
+            SMHIJson smjson = SMHIJson.FromJson(lines[0]);
+
+            // 1. hitta rätt tid i TimeSeris[0] eller [1]    
+            // 2. hitta rätt Parameters[1] t.ex.där är name = "t"
+            foreach (Parameter param in smjson.TimeSeries[1].Parameters)
             {
-                int result = dlFileToTempFolder(smhiUri,
-                                           filenames[nr]) ;
-
-                
-                Thread.Sleep(milliseconds); // Vänta ett tag så inte SMHI bannar oss? jag har ingen aning.
-
-
-                if (result == 0)
-                {
-                    try
-                    {
-                        // lets parse the heck out of this json file
-
-                        // Vi får lov att skapa en C# class till just SMHI:s json-fil. Så därså.
-                        string[] lines = File.ReadAllLines(tempFolder + filenames[nr]);                  // WORRY MAYBE IS TOO BIG FILE YA?
-                        SMHIJson smjson = SMHIJson.FromJson(lines[0]);
-
-                        // 1. hitta rätt tid i TimeSeris[0] eller [1]
-
-                        // 2.hitta rätt Parameters[1] t.ex.där är name = "t"
-                        foreach (Parameter param in smjson.TimeSeries[1].Parameters)
-                        {
-                            if (param.Name == "t")
-                            {
-                                outputStr.Add("" + preString[nr] + param.Values[0] + " C");
-                            }
-                        }
-                         
-
-                    }
-                    catch (Exception)
-                    {
-                        System.Console.WriteLine("Exception smhi!");
-                        await ctx.Channel.SendMessageAsync("Jag är Error.").ConfigureAwait(false);
-                    }
-                }
-                nr++;
-
+              if (param.Name == "t")
+              {
+                item.FinalString = $"{item.OutputPreString} {param.Values[0]}  C {item.OutputPostString}";
+                //outputStr.Add("" + preString[nr] + param.Values[0] + " C");
+              }
+              if (param.Name.ToLower() == "wsymb2")
+              {
+                item.FinalString += " " + SmhiGetWeatherEmoji(param.Values[0]);                            // UNTESTED 
+              }
             }
 
 
-            // Samla ihop alla delsträngar till en slutsträng och skriv till kanal.
+          }
+          catch (Exception ex)
+          {
+            System.Console.WriteLine($"Exception smhi! {ex.ToString()}");
+            await ctx.Channel.SendMessageAsync("Jag är Error.").ConfigureAwait(false);
+          }
+        }
+                                                         
+      }
 
-            foreach(string outStr in outputStr)
-            {
-                finalOutString += outStr + "\n";
-            }
 
-            await ctx.Channel.SendMessageAsync(finalOutString).ConfigureAwait(false);
+                       
+
+
+          // Samla ihop alla delsträngar till en slutsträng och skriv till kanal.
+
+
+          Console.WriteLine("Compiling.");
+          foreach (var item in smhiDataList)
+          {
+            finalOutString += item.FinalString + "\n";
+          }
+          //foreach(string outStr in outputStr)
+          //{
+          //    finalOutString += outStr + "\n";
+          //}
+
+         await ctx.Channel.SendMessageAsync(finalOutString).ConfigureAwait(false);
 
         }
-         
-        
-        // (++)
-        [Description("Statistik om skämtdatabasen")]
+
+     
+    // (-+)
+    public static string SmhiGetWeatherEmoji(double dbl)
+    {
+      int nr = (int)Math.Round(dbl);
+      return nr switch
+      {
+        1 => "☀️ Clear sky",   // 
+        2 => "🌤 Nearly clear sky",   // 
+        3 => "⛅️ Variable cloudiness",   // 
+        4 => "🌥 Halfclear sky",   // 
+        5 => "☁️ Cloudy sky",   // 
+        6 => "☁️ Overcast",   // 
+        7 => "🌫 Fog",   // 
+        8 => "🌦 Light rain showers",   // 
+        9 => "🌧🌧 Moderate rain showers",   // 
+        10 => "🌧🌧🌧 Heavy rain showers",   // 
+        11 => "⛈ Thunderstorm",   // 
+        12 => "🌨 Light sleet showers",   // 
+        13 => "🌨🌨 Moderate sleet showers",   // 
+        14 => "🌨🌨🌨 Heavy sleet showers",   // 
+        15 => "🌨 Light snow showers",   // 
+        16 => "🌨🌨 Moderate snow showers",   // 
+        17 => "🌨🌨🌨 Heavy snow showers",   // 
+        18 => "🌧 Light rain",   // 
+        19 => "🌧🌧 Moderate rain",   // 
+        20 => "🌧🌧🌧 Heavy rain",   // 
+        21 => "🌩 Thunder",   // 
+        22 => "🌨 Light sleet",   // 
+        23 => "🌨🌨 Moderate sleet",   // 
+        24 => "🌨🌨🌨 Heavy sleet",   // 
+        25 => "❄️ Light snowfall",   // 
+        26 => "❄️❄️ Moderate snowfall",   // 
+        27 => "❄️❄️❄️ Heavy snowfall",   // 
+        _ => "❓ Unknown code, smhi changed something in the matrix!"     // 
+      };
+
+
+      /*
+        1 => "☀️",   // Clear sky
+        2 => "🌤",   // Nearly clear sky
+        3 => "⛅️",   // Variable cloudiness
+        4 => "🌥",   // Halfclear sky
+        5 => "☁️",   // Cloudy sky
+        6 => "☁️",   // Overcast
+        7 => "🌫",   // Fog
+        8 => "🌦",   // Light rain showers
+        9 => "🌧🌧",   // Moderate rain showers
+        10 => "🌧🌧🌧",   // Heavy rain showers
+        11 => "⛈",   // Thunderstorm
+        12 => "🌨",   // Light sleet showers
+        13 => "🌨🌨",   // Moderate sleet showers
+        14 => "🌨🌨🌨",   // Heavy sleet showers
+        15 => "🌨",   // Light snow showers
+        16 => "🌨🌨",   // Moderate snow showers
+        17 => "🌨🌨🌨",   // Heavy snow showers
+        18 => "🌧",   // Light rain
+        19 => "🌧🌧",   // Moderate rain
+        20 => "🌧🌧🌧",   // Heavy rain
+        21 => "🌩",   // Thunder
+        22 => "🌨",   // Light sleet
+        23 => "🌨🌨",   // Moderate sleet
+        24 => "🌨🌨🌨",   // Heavy sleet
+        25 => "❄️",   // Light snowfall
+        26 => "❄️❄️",   // Moderate snowfall
+        27 => "❄️❄️❄️",   // Heavy snowfall
+      */
+    }
+
+    // (++)
+    [Description("Statistik om skämtdatabasen")]
         [Command("jokestats")]
         public async Task jokestats(CommandContext ctx)
         {
@@ -476,7 +742,7 @@ namespace kkbot.commands
           await helg(ctx);
         }
 
-        // (--) 
+        // (++) 
 
         [Command("hälja")]
         public async Task helg(CommandContext ctx)

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("kkbot")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4e458437f9057f4c660ff1f44fee44db94972516")]
 [assembly: System.Reflection.AssemblyProductAttribute("kkbot")]
 [assembly: System.Reflection.AssemblyTitleAttribute("kkbot")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
