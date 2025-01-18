@@ -1,14 +1,3 @@
-kkbot/bin/Debug/netcoreapp3.1/config.json
-kkbot/bin/Debug/netcoreapp3.1/temp
-kkbot/bin/Debug/netcoreapp3.1/tips.txt
-kkbot/obj/Debug/netcoreapp3.1/kkbot.assets.cache
-kkbot/obj/Debug/netcoreapp3.1/kkbot.csprojAssemblyReference.cache
-kkbot/obj/kkbot.csproj.nuget.dgspec.json
-kkbot/bin/Debug/netcoreapp3.1/config.json
-.vs
-
-
-kkbot/obj/Release/netcoreapp3.1/kkbot.pdb
-kkbot/obj/Release/netcoreapp3.1/kkbot.genruntimeconfig.cache
-.obj/Debug
-.obj/Release
+kkbot/bin
+kkbot/obj
+.vs 
