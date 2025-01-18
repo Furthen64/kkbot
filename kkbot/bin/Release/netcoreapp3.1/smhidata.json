@@ -1,0 +1,22 @@
+[
+  {
+    "Filename": "smhi_munkfors.txt",
+    "SmhiUri": "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/13.546200/lat/59.836500/data.json",
+    "OutputPreString": "Temp i Munkfors nu: "
+  },
+  {
+    "Filename": "smhi_kristinehamn.txt",
+    "SmhiUri": "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/14.093200/lat/59.320700/data.json",
+    "OutputPreString": "Temp i Kristinehamn nu: "
+  },
+  {
+    "Filename": "smhi_ojebyn.txt",
+    "SmhiUri": "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/21.40395/lat/65.347303/data.json",
+    "OutputPreString": "Temp i Öjebyn nu: "
+  },
+  {
+    "Filename": "smhi_vaxjo.txt",
+    "SmhiUri": "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/14.799379/lat/56.886011/data.json",
+    "OutputPreString": "Temp i Växjö nu: "
+  }
+]
