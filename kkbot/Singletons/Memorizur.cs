@@ -27,30 +27,30 @@ namespace kkbot.Singletons
             recentlyUsedJokeLineNumbers = new Dictionary<int, DateTime>();
             recentlyUsedQuoteLineNumbers = new Dictionary<int, DateTime>();
             recentlyUsedHelgLineNumbers = new Dictionary<int, DateTime>();
+            recentlyUsedSemesterLineNumbers = new  Dictionary<int, DateTime>();
         }
 
-        public static Memorizur Instance { get { return Nested.instance; } }
-
-
+        public static Memorizur Instance { get { return Nested.instance; } }  
 
         // Non Singleton stuff:
         public Dictionary <int, DateTime> recentlyUsedJokeLineNumbers;
         public Dictionary<int, DateTime> recentlyUsedQuoteLineNumbers;
         public Dictionary<int, DateTime> recentlyUsedHelgLineNumbers;
+        public Dictionary<int, DateTime> recentlyUsedSemesterLineNumbers;
 
 
 
 
-        private class Nested
+    private class Nested
+    {
+        // Explicit static constructor to tell C# compiler
+        // not to mark type as beforefieldinit
+        static Nested()
         {
-            // Explicit static constructor to tell C# compiler
-            // not to mark type as beforefieldinit
-            static Nested()
-            {
-            }
-
-            internal static readonly Memorizur instance = new Memorizur();
         }
+
+        internal static readonly Memorizur instance = new Memorizur();
     }
+  }
 
 }

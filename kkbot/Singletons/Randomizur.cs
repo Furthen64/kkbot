@@ -24,10 +24,7 @@ namespace kkbot.Singletons
             randomObj = new Random();
         }
 
-        public static Randomizur Instance { get { return Nested.instance; } }
-
-
-
+        public static Randomizur Instance { get { return Nested.instance; } }   
 
         // Non Singleton stuff:
         private Random randomObj;
@@ -36,10 +33,7 @@ namespace kkbot.Singletons
         public int getInt(int fromInt, int maxInt)
         {
             return fromInt + randomObj.Next(maxInt);
-        }
-
-
-
+        }         
         private class Nested
         {
             // Explicit static constructor to tell C# compiler

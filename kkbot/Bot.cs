@@ -14,10 +14,7 @@ using DSharpPlus.Interactivity.Extensions;
 namespace kkbot
 {
     public class Bot
-    {
-
-        
-
+    {      
         public DiscordClient client { get; private set; }
         //         get:   betyder att vi kan nå den genom "bot.Client" 
         // private set:   men för att ändra den så måste det ske privat här i klassen
@@ -38,25 +35,27 @@ namespace kkbot
 
             var json = string.Empty;
             string fileName = "./config.json";
+            Console.WriteLine($"reading from {fileName}");
+
+
             try
             {
                 using (var fs = File.OpenRead(fileName))
                 {
                     using (var sr = new StreamReader(fs, new UTF8Encoding(false)))
                     {
-                        json = await sr.ReadToEndAsync().ConfigureAwait(false); // ?? added performance
+                      json = await sr.ReadToEndAsync().ConfigureAwait(false); // ?? added performance
                     }
                 }
-            } catch(Exception)
+            } 
+            catch(Exception)
             {
                 Console.WriteLine("ioerror, could not read file: " + fileName);
                 return;
-            }
-
-            // Now deserialize and convert the json to our Struct
+            }            
             var configJson = JsonConvert.DeserializeObject<ConfigJson>(json);
-            
-            
+
+
 
 
             // Load up the "config.json" and populate this config object
@@ -69,8 +68,7 @@ namespace kkbot
 
             //  MinimumLogLevel = 
              // LogLevel = LogLevel.Debug,      deleted 2022.08.20 due to changes to DSharp
-            // UseInternalLogHandler = true
-
+            // UseInternalLogHandler = true      
             
             client = new DiscordClient(config);
 
@@ -79,10 +77,7 @@ namespace kkbot
             ClientExtensions.UseInteractivity(client, new InteractivityConfiguration()
                                                   {
                                                     Timeout = TimeSpan.FromMinutes(2) 
-                                                  });
-
- 
-            
+                                                  });      
 
 
             // Assign a function to run whenever the Client reaches the "Ready" state
